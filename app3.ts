@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 const client = new Midjourney({
     ServerId: "1082500871478329374",
     ChannelId: "1094892992281718894",
-    SalaiToken: "NDI3MDExMDQ3MjEyMzE4NzIw.G9GnL_.kkOyR3ggzboP48GI1l_NvGU-ngxSLscEhWhrac",
+    SalaiToken: "NDI3MDExMDQ3MjEyMzE4NzIw.GQ1zr_.ZPhiOlTSKVec0dxSvSCd-sCQkiFM1Ga46FYZ4Y",
     Debug: true,
     Ws: true    
   })
@@ -71,10 +71,11 @@ async function fUpscale(id, data_obj_i, up_id){
     */
     await client.Connect()
     const ImagineRequest=data[id]['obj'][data_obj_i];
-    const Upscale = await client.Custom({
-        msgId: ImagineRequest.id,
+    const Upscale = await client.Upscale({
+        index: up_id,
+        msgId: <string>ImagineRequest.id,
+        hash: <string>ImagineRequest.hash,
         flags: ImagineRequest.flags,
-        customId: ImagineRequest.options?.find((o) => o.label === up_id)?.custom,
         loading: (uri, progress) => {
             console.log("Upscale.loading", uri, "progress", progress);
             data[id]['progress'] = [uri, progress];
@@ -106,8 +107,7 @@ app.get('/api/imagine/:prompt', (req, res) => {
     data[id] = {"progress":["","waiting to start"], "obj":[]}
 
     fImagine(id, req.params.prompt)
-    return res.redirect("http://localhost:"+port+"/api/update/"+id)
-    //return res.json({"id":id});
+    return res.json({"status": "api working for your request, please use http://34.155.55.120:3000/api/update/"+id, "id":id})
 });
 
 app.get('/api/variation/:id/:data_obj_i/:var_id', (req,res) => {
@@ -122,8 +122,8 @@ app.get('/api/variation/:id/:data_obj_i/:var_id', (req,res) => {
     data[id]['progress'] = ["","waiting to start"];
     if(data[id]['obj'][req.params.data_obj_i].progress==='done'){
         fVariation(id, req.params.data_obj_i, req.params.var_id)
-        return res.redirect("http://localhost:"+port+"/api/update/"+id)
-        //res.json({"status": "api working for your request, please use api/update/id", "id":id})
+        //return res.redirect("http://localhost:"+port+"/api/update/"+id)
+        return res.json({"status": "api working for your request, please use http://34.155.55.120:3000/api/update/"+id, "id":id})
     }
     else{
         res.status(500);
@@ -141,8 +141,7 @@ app.get('/api/upscale/:id/:data_obj_i/:up_id', (req,res) => {
     data[id]['progress'] = ["","waiting to start"];
     if(data[id]['obj'][req.params.data_obj_i].progress==='done'){
         fUpscale(id, req.params.data_obj_i, req.params.up_id)
-        return res.redirect("http://localhost:"+port+"/api/update/"+id)
-        //res.json({"status": "api working for your request, please use api/update/id to see progress", "id":id})
+        return res.json({"status": "api working for your request, please use http://34.155.55.120:3000/api/update/"+id, "id":id})
     }
     else{
         res.status(500);
@@ -155,6 +154,11 @@ app.get('/api/update/:id', (req,res) => {
     return res.json({"id":id, "uri":data[id]['progress'][0], "progress":data[id]['progress'][1]});
 });
 
-app.get('/api/allupdate', (req,res) => {
-    return res.json(data);
+app.get('/api/admin/allupdate/:pswd', (req,res) => {
+    if(req.params.pswd == "Odg82000!"){
+        return res.json(data);
+    }
+    else{
+        return res.json({"status" : "error, you entered the wrong password"})
+    }
 });
