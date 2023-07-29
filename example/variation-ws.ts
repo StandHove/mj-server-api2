@@ -9,9 +9,9 @@ import { Midjourney } from "../src";
  */
 async function main() {
   const client = new Midjourney({
-    ServerId: <string>process.env.SERVER_ID,
-    ChannelId: <string>process.env.CHANNEL_ID,
-    SalaiToken: <string>process.env.SALAI_TOKEN,
+    ServerId: "1082500871478329374",
+    ChannelId: "1094892992281718894",
+    SalaiToken: "NDI3MDExMDQ3MjEyMzE4NzIw.G9GnL_.kkOyR3ggzboP48GI1l_NvGU-ngxSLscEhWhrac",
     Debug: true,
     Ws: true, //enable ws is required for remix mode
   });
@@ -36,7 +36,7 @@ async function main() {
     flags: Imagine.flags,
     content: prompt,
     loading: (uri: string, progress: string) => {
-      console.log("Variation1.loading", uri, "progress", progress);
+      console.log("Variation1.loading", uri, "progress", progress,"index :", 1, "msgId: <string>Imagine.id : ", <string>Imagine.id, "hash: <string>Imagine.hash", <string>Imagine.hash, "Imagine.flags", Imagine.flags, "content: prompt", prompt);
     },
   });
   console.log("Variation", Variation);
